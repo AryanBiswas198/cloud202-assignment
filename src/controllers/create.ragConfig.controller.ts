@@ -2,7 +2,7 @@ import RAGConfig from "@/model/ragConfig.model";
 import { ragConfigSchema } from "@/schema/ragConfig";
 import { z } from "zod";
 
-type RAGConfigType = z.infer<typeof ragConfigSchema>;
+export type RAGConfigType = z.infer<typeof ragConfigSchema>;
 
 export const createRAGConfig = async (body: RAGConfigType) => {
   const validationResult = ragConfigSchema.safeParse(body);

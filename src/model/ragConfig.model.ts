@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IRAGConfig extends Document {
   appName: string;
-  description: string;
+  appDescription: string;
   knowledgeBaseName: string;
   knowledgeBaseDescription: string;
   pattern: string;
@@ -15,7 +15,7 @@ export interface IRAGConfig extends Document {
 const RAGConfigSchema = new Schema<IRAGConfig>(
   {
     appName: { type: String, required: true, index: true },
-    description: { type: String, required: true },
+    appDescription: { type: String, required: true },
     knowledgeBaseName: { type: String, required: true, index: true },
     knowledgeBaseDescription: { type: String, required: true },
     pattern: { type: String, required: true },

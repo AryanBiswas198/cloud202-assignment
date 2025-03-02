@@ -11,9 +11,9 @@ const options = {
   chunking: ["Semantic", "Fixed-sized", "Recursive"],
 };
 
-interface RAGConfigFormData {
-  appName: string;
-  description: string;
+export interface RAGConfigFormData {
+  appName?: string;
+  description?: string;
   knowledgeBaseName: string;
   knowledgeBaseDescription: string;
   pattern: string;
@@ -29,7 +29,6 @@ export default function RAGConfigForm() {
   const [configs, setConfigs] = useState<RAGConfigFormData[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  // Fetch all configurations on mount
   useEffect(() => {
     async function fetchData() {
       setFetching(true);
@@ -47,7 +46,7 @@ export default function RAGConfigForm() {
     if (result.success) {
       alert("Configuration saved successfully!");
       reset();
-      setConfigs((prev) => [...prev, data]); // Optimistic UI update
+      setConfigs((prev) => [...prev, data]); 
     } else {
       alert(`Error: ${result.message}`);
     }
@@ -56,7 +55,6 @@ export default function RAGConfigForm() {
 
   return (
     <div className="max-w-lg mx-auto p-4 space-y-6 border rounded-md">
-      {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <input {...register("appName", { required: true })} placeholder="App Name" className="w-full p-2 border rounded" />
         <textarea {...register("description", { required: true })} placeholder="Description" className="w-full p-2 border rounded" />
@@ -81,7 +79,6 @@ export default function RAGConfigForm() {
         </button>
       </form>
 
-      {/* Display Configurations */}
       <div className="border-t pt-4">
         <h2 className="text-lg font-semibold">Stored Configurations</h2>
         {fetching ? (

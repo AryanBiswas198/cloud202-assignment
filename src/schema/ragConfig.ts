@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const ragConfigSchema = z.object({
   appName: z.string().min(1, "App Name is required"),
-  description: z.string().min(1, "Description is required"),
+  appDescription: z.string().min(1, "Description is required"),
   knowledgeBaseName: z.string().min(1, "Knowledge Base Name is required"),
   knowledgeBaseDescription: z.string().min(1, "Knowledge Base Description is required"),
   pattern: z.enum([

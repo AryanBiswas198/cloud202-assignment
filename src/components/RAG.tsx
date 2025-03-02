@@ -1,9 +1,12 @@
 "use client";
+import { createRAGConfig, getAllRAGConfigs } from "@/lib/api/ragConfig";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 type RAGFormData = {
   knowledgeBaseName: string;
-  description: string;
+  knowledgeBaseDescription: string;
   pattern: string;
   embeddings: string;
   metrics: string;
@@ -11,16 +14,76 @@ type RAGFormData = {
   vectorDB: string;
 };
 
+export interface RAGConfigFormData {
+  appName?: string;
+  appDescription?: string;
+  knowledgeBaseName: string;
+  knowledgeBaseDescription: string;
+  pattern: string;
+  embeddings: string;
+  metrics: string;
+  chunking: string;
+  vectorDB: string;
+}
+
 type Props = {
-    setActiveTab: (tab: string) => void;
-  };
-  
+  setActiveTab: (tab: string) => void;
+  basicConfigData: any;
+  setBasicConfigData: (data: FormData) => void;
+  setRagData: (data: RAGConfigFormData) => void;
+};
 
-export default function RAGConfig({ setActiveTab }: Props) {
-  const { register, handleSubmit, formState: { errors } } = useForm<RAGFormData>();
+export default function RAGConfig({
+  setActiveTab,
+  basicConfigData,
+  setBasicConfigData,
+  setRagData,
+}: Props) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RAGFormData>();
 
-  const onSubmit = (data: RAGFormData) => {
-    console.log("RAG Config Data:", data);
+  const [configurations, setConfigurations] = useState<RAGConfigFormData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refresh, setRefresh] = useState<boolean>(false);
+
+  useEffect(() => {
+    const loadConfigurations = async () => {
+      try {
+        const data = await getAllRAGConfigs();
+        setConfigurations(data);
+      } catch (error) {
+        toast.error("Failed to load configurations");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadConfigurations();
+  }, [refresh]); 
+
+  const onSubmit = async (ragData: RAGFormData) => {
+    if (!basicConfigData || Object.keys(basicConfigData).length === 0) {
+      toast.error("Basic Configuration is required before proceeding!");
+      return;
+    }
+
+    const finalData: RAGConfigFormData = { ...basicConfigData, ...ragData };
+    setRagData(finalData);
+
+    const result = await createRAGConfig(finalData);
+    if (result.success) {
+      toast.success("Configuration saved successfully!");
+      setRefresh((prev) => !prev); 
+    } else {
+      toast.error(`Error: ${result.message}`);
+    }
+
+    if (typeof setBasicConfigData === "function") {
+      setBasicConfigData({} as any);
+    }
   };
 
   return (
@@ -34,28 +97,48 @@ export default function RAGConfig({ setActiveTab }: Props) {
         className="border border-gray-200 p-6 mt-6 rounded shadow-sm w-full"
       >
         <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-1">Knowledge Base Name</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Knowledge Base Name
+          </label>
           <input
             type="text"
-            {...register("knowledgeBaseName", { required: "Knowledge Base Name is required" })}
+            {...register("knowledgeBaseName", {
+              required: "Knowledge Base Name is required",
+            })}
             className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
             placeholder="Enter knowledge base name"
           />
+          {errors.knowledgeBaseName && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.knowledgeBaseName.message}
+            </p>
+          )}
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-1">Description</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Description
+          </label>
           <input
             type="text"
-            {...register("description", { required: "Description is required" })}
+            {...register("knowledgeBaseDescription", {
+              required: "Description is required",
+            })}
             className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
             placeholder="Enter description"
           />
+          {errors.knowledgeBaseDescription && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.knowledgeBaseDescription.message}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-4 mb-4">
           <div className="flex-1">
-            <label className="block text-gray-700 font-medium mb-1">Pattern</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Pattern
+            </label>
             <select
               {...register("pattern")}
               className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
@@ -70,7 +153,9 @@ export default function RAGConfig({ setActiveTab }: Props) {
           </div>
 
           <div className="flex-1">
-            <label className="block text-gray-700 font-medium mb-1">Embeddings</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Embeddings
+            </label>
             <select
               {...register("embeddings")}
               className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
@@ -85,7 +170,9 @@ export default function RAGConfig({ setActiveTab }: Props) {
 
         <div className="flex gap-4 mb-4">
           <div className="flex-1">
-            <label className="block text-gray-700 font-medium mb-1">Metrics</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Metrics
+            </label>
             <select
               {...register("metrics")}
               className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
@@ -99,7 +186,9 @@ export default function RAGConfig({ setActiveTab }: Props) {
           </div>
 
           <div className="flex-1">
-            <label className="block text-gray-700 font-medium mb-1">Chunking</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Chunking
+            </label>
             <select
               {...register("chunking")}
               className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
@@ -113,27 +202,75 @@ export default function RAGConfig({ setActiveTab }: Props) {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-1">Vector DB</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Vector DB
+          </label>
           <input
             type="text"
             {...register("vectorDB", { required: "Vector DB is required" })}
             className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black transition"
             placeholder="Enter Vector DB"
           />
+          {errors.vectorDB && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.vectorDB.message}
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="text-[#4a5d4f] border border-gray-200 bg-white px-4 py-2 rounded shadow-sm font-medium hover:bg-gray-100 transition cursor-pointer"
+          className="bg-black text-white px-8 py-2 rounded hover:bg-gray-800 transition font-medium cursor-pointer"
         >
           Add Configuration
         </button>
+        <div className="mt-10">
+          {loading ? (
+            <p>Loading configurations...</p>
+          ) : configurations.length > 0 ? (
+            <div className="overflow-x-auto border border-gray-100 rounded-lg">
+              <table className="min-w-full bg-white border-collapse">
+                <thead className="bg-gray-100 text-gray-400 text-sm border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-4 py-2">KB Name</th>
+                    <th className="text-left px-4 py-2">Description</th>
+                    <th className="text-left px-4 py-2">Pattern</th>
+                    <th className="text-left px-4 py-2">Embeddings</th>
+                    <th className="text-left px-4 py-2">Metrics</th>
+                    <th className="text-left px-4 py-2">Chunking</th>
+                    <th className="text-left px-4 py-2">Vector DB</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {configurations.map((config, index) => (
+                    <tr
+                      key={index}
+                      className="border-b text-sm border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-2">{config.knowledgeBaseName}</td>
+                      <td className="px-4 py-2">
+                        {config.knowledgeBaseDescription}
+                      </td>
+                      <td className="px-4 py-2">{config.pattern}</td>
+                      <td className="px-4 py-2">{config.embeddings}</td>
+                      <td className="px-4 py-2">{config.metrics}</td>
+                      <td className="px-4 py-2">{config.chunking}</td>
+                      <td className="px-4 py-2">{config.vectorDB}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>No configurations saved yet.</p>
+          )}
+        </div>
       </form>
 
       <div className="flex justify-between mt-10">
         <button
           className="bg-gray-300 px-8 py-2 rounded hover:bg-gray-400 transition text-gray-800 font-medium cursor-pointer"
-          onClick={() => setActiveTab("Basic Config")} 
+          onClick={() => setActiveTab("Basic Config")}
         >
           Previous
         </button>

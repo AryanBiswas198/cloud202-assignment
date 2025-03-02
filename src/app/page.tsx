@@ -11,13 +11,15 @@ import Workflow from "@/components/Workflows";
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("Basic Config");
+  const [basicConfigData, setBasicConfigData] = useState({});
+  const [ragData, setRagData] = useState({});
 
   const renderContent = () => {
     switch (activeTab) {
       case "Basic Config":
-        return <BasicConfig setActiveTab={setActiveTab} />;
+        return <BasicConfig setActiveTab={setActiveTab} setBasicConfigData={setBasicConfigData} />;
       case "RAG":
-        return <Rag setActiveTab={setActiveTab} />;
+        return <Rag setActiveTab={setActiveTab} basicConfigData={basicConfigData} setBasicConfigData={setBasicConfigData} setRagData={setRagData} />;
       case "Workflows":
         return <Workflow setActiveTab={setActiveTab} />;
       case "Security Overview":
@@ -25,12 +27,14 @@ export default function Home() {
       case "Overview":
         return <Overview setActiveTab={setActiveTab} />;
       default:
-        return <BasicConfig setActiveTab={setActiveTab} />;
+        return <BasicConfig setActiveTab={setActiveTab} setBasicConfigData={setBasicConfigData} />;
     }
   };
 
   return (
-    <div className="flex h-screen relative">
+    <div className="flex h-screen">
+      <Sidebar isOpen={isSidebarOpen} activeTab={activeTab} setActiveTab={setActiveTab} />
+
       <div
         className={`fixed top-4 text-gray-800 cursor-pointer transition-all duration-300 ${
           isSidebarOpen ? "left-[21%]" : "left-4"
@@ -40,9 +44,11 @@ export default function Home() {
         <BsLayoutSidebar size={20} />
       </div>
 
-      <Sidebar isOpen={isSidebarOpen} activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <div className="flex-1 flex flex-col p-6 transition-all duration-300">
+      <div
+        className={`flex-1 flex flex-col p-6 transition-all duration-300 ${
+          isSidebarOpen ? "ml-[20%]" : "ml-0"
+        }`}
+      >
         {renderContent()}
       </div>
     </div>
