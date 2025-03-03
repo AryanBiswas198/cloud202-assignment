@@ -14,6 +14,8 @@ export default function Home() {
   const [basicConfigData, setBasicConfigData] = useState({});
   const [ragData, setRagData] = useState({});
 
+  console.log("Printing RagData: ", ragData);
+
   const renderContent = () => {
     switch (activeTab) {
       case "Basic Config":

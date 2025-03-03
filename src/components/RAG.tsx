@@ -28,6 +28,7 @@ export interface RAGConfigFormData {
 
 type Props = {
   setActiveTab: (tab: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   basicConfigData: any;
   setBasicConfigData: (data: FormData) => void;
   setRagData: (data: RAGConfigFormData) => void;
@@ -55,7 +56,7 @@ export default function RAGConfig({
         const data = await getAllRAGConfigs();
         setConfigurations(data);
       } catch (error) {
-        toast.error("Failed to load configurations");
+        toast.error(`Failed to load configurations, ${error}`);
       } finally {
         setLoading(false);
       }
@@ -82,6 +83,7 @@ export default function RAGConfig({
     }
 
     if (typeof setBasicConfigData === "function") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setBasicConfigData({} as any);
     }
   };

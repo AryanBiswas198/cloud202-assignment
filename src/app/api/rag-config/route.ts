@@ -25,7 +25,9 @@ export async function POST(req: Request) {
         { message: "RAG Configuration saved successfully", data: newRAGConfig },
         { status: 201 }
         );
-    } catch (error: any) {
+    } catch (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      error: any) {
         console.error("Error saving RAG Config:", error);
         return Response.json(
         { error: error.message || "Internal Server Error", details: error.details || null },

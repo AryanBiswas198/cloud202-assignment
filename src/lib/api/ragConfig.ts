@@ -1,4 +1,6 @@
-export const createRAGConfig = async (data: any) => {
+import { RAGConfigFormData } from "@/components/RAGConfigForm";
+
+export const createRAGConfig = async (data: RAGConfigFormData) => {
     try {
       const response = await fetch("/api/rag-config", {
         method: "POST",

@@ -6,6 +6,6 @@ export async function GET() {
     await dbConnect();
     return Response.json({ message: "Connected to MongoDB" });
   } catch (error) {
-    return NextResponse.json({ message: "Database connection failed" }, { status: 500 });
+    return NextResponse.json({ message: "Database connection failed", error }, { status: 500 });
   }
 }
